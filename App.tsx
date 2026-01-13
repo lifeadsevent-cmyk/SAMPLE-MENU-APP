@@ -95,8 +95,8 @@ const App: React.FC = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <button className="p-2 text-stone-500 hover:text-amber-500 transition-colors"><Share2 size={20} /></button>
-          <button className="p-2 text-stone-500 hover:text-amber-500 transition-colors"><Info size={20} /></button>
+          <button className="p-2 text-stone-500 hover:text-amber-500 transition-colors" aria-label="Partager"><Share2 size={20} /></button>
+          <button className="p-2 text-stone-500 hover:text-amber-500 transition-colors" aria-label="Informations"><Info size={20} /></button>
         </div>
       </header>
 

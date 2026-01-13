@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, Sparkles, ChefHat } from 'lucide-react';
+import { MessageSquare, X, Send, ChefHat } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 
 const AIAssistant: React.FC = () => {
@@ -26,8 +26,9 @@ const AIAssistant: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Initialize GoogleGenAI with process.env.API_KEY directly as per guidelines
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      // The API key is sourced from process.env.API_KEY as per instructions.
+      // Make sure you have set 'API_KEY' in your Netlify Environment Variables.
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: messages.map(m => ({
@@ -35,16 +36,15 @@ const AIAssistant: React.FC = () => {
           parts: [{ text: m.text }]
         })).concat({ role: 'user', parts: [{ text: userMessage }] }),
         config: {
-          systemInstruction: "Tu es l'assistant de prestige du restaurant 'L'Éclat d'Or' à Marrakech. Ton ton est extrêmement poli, luxueux et passionné par la gastronomie marocaine. Aide les clients à choisir leurs plats, explique les ingrédients si nécessaire, et suggère des accords mets-vins ou boissons. Reste concis et élégant.",
+          systemInstruction: "Tu es l'assistant de prestige du restaurant 'L'Éclat d'Or' à Marrakech. Ton ton est extrêmement poli, luxueux et passionné par la gastronomie marocaine. Aide les clients à choisir leurs plats, explique les ingrédients si nécessaire, et suggère des accords mets-vins ou boissons. Reste concis et élégant. Ne demande jamais la clé API de l'utilisateur.",
         }
       });
 
-      // Accessing .text as a property as per SDK documentation
       const aiText = response.text || "Je vous prie de m'excuser, une légère perturbation dans mes pensées. Comment puis-je vous aider ?";
       setMessages(prev => [...prev, { role: 'model', text: aiText }]);
     } catch (error) {
       console.error("AI Error:", error);
-      setMessages(prev => [...prev, { role: 'model', text: "Je rencontre une difficulté technique, mais mes recommandations restent à votre disposition dans le menu." }]);
+      setMessages(prev => [...prev, { role: 'model', text: "Je rencontre une difficulté technique pour accéder à mes pensées gourmandes. Mon service sera bientôt rétabli." }]);
     } finally {
       setIsLoading(false);
     }
@@ -56,12 +56,13 @@ const AIAssistant: React.FC = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`group relative flex items-center justify-center w-14 h-14 rounded-full bg-stone-900 border border-amber-600/50 text-amber-500 shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 ${isOpen ? 'rotate-90' : ''}`}
+        aria-label="Ouvrir l'assistant IA"
       >
         <div className="absolute inset-0 rounded-full bg-amber-600/10 animate-pulse group-hover:bg-amber-600/20"></div>
         {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
         {!isOpen && (
           <span className="absolute right-full mr-4 px-3 py-1 bg-stone-900/90 border border-amber-600/30 text-amber-500 text-[10px] uppercase tracking-[0.2em] whitespace-nowrap rounded-sm backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-            Assistant Gastronomique
+            Concierge IA
           </span>
         )}
       </button>
@@ -75,8 +76,8 @@ const AIAssistant: React.FC = () => {
               <ChefHat size={20} className="text-amber-500" />
             </div>
             <div>
-              <h3 className="text-amber-500 font-serif text-sm tracking-widest uppercase">Concierge IA</h3>
-              <p className="text-[9px] text-stone-500 uppercase tracking-tighter">Votre guide culinaire personnel</p>
+              <h3 className="text-amber-500 font-serif text-sm tracking-widest uppercase">Concierge Gastronomique</h3>
+              <p className="text-[9px] text-stone-500 uppercase tracking-tighter">Élégance & Saveurs</p>
             </div>
           </div>
 
@@ -117,7 +118,7 @@ const AIAssistant: React.FC = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="Posez votre question..."
+                placeholder="Votre question..."
                 className="flex-1 bg-stone-950 border border-amber-900/40 rounded-sm px-3 py-2 text-sm text-stone-200 focus:outline-none focus:border-amber-500 transition-colors"
               />
               <button
