@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>L'Éclat d'Or - Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0c0a09;
+            color: #f5f5f4;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Viewport fixe le point de perspective au centre de l'écran */
+        .book-viewport {
+            perspective: 2500px;
+            width: 100vw;
+            height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+        
+        /* La canvas contient la reliure à son point 0 (gauche) */
+        .book-canvas {
+            position: relative;
+            width: 85vw; /* Largeur d'une page unique */
+            max-width: 380px;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+            /* On positionne la reliure exactement au centre horizontal du viewport par défaut */
+            left: 50%; 
+        }
+
+        .sheet {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transform-origin: left center;
+            transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+            transform-style: preserve-3d;
+            pointer-events: none;
+        }
+
+        .sheet.active {
+            pointer-events: auto;
+        }
+
+        .sheet.flipped {
+            transform: rotateY(-180deg);
+        }
+
+        .sheet-front, .sheet-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            background-color: #1c1917;
+        }
+
+        .sheet-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Texture et détails */
+        .spine-line {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to right, rgba(0,0,0,0.5), rgba(180, 83, 9, 0.2), rgba(0,0,0,0.5));
+            z-index: 100;
+        }
+
+        .paper-texture::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Ombre réaliste sur la pliure */
+        .page-fold-shadow {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 30px;
+            background: linear-gradient(to right, rgba(0,0,0,0.4) 0%, transparent 100%);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.35.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3"
+  }
+}
+</script>
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>
