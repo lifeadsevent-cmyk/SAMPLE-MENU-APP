@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Share2, Info, ChevronLeft, ChevronRight } from 'lucide-react';
-import PageContent from '../components/PageContent';
-import FlipSheet from '../components/FlipSheet';
-import ExpandedImage from '../components/ExpandedImage';
-import AIAssistant from '../components/AIAssistant';
-import { MenuItem } from '../types';
-import { MENU_ITEMS } from '../constants';
+import PageContent from './components/PageContent';
+import FlipSheet from './components/FlipSheet';
+import ExpandedImage from './components/ExpandedImage';
+import AIAssistant from './components/AIAssistant';
+import { MenuItem } from './types';
+import { MENU_ITEMS } from './constants';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
