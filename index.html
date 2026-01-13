@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -5,8 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>L'Éclat d'Or - Menu</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -17,12 +16,12 @@
             position: fixed;
             width: 100%;
             height: 100%;
+            margin: 0;
         }
         .font-serif {
             font-family: 'Playfair Display', serif;
         }
 
-        /* Viewport fixe le point de perspective au centre de l'écran */
         .book-viewport {
             perspective: 2500px;
             width: 100vw;
@@ -33,15 +32,13 @@
             overflow: visible;
         }
         
-        /* La canvas contient la reliure à son point 0 (gauche) */
         .book-canvas {
             position: relative;
-            width: 85vw; /* Largeur d'une page unique */
+            width: 85vw;
             max-width: 380px;
             height: 100%;
             transform-style: preserve-3d;
             transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
-            /* On positionne la reliure exactement au centre horizontal du viewport par défaut */
             left: 50%; 
         }
 
@@ -81,7 +78,6 @@
             transform: rotateY(180deg);
         }
 
-        /* Texture et détails */
         .spine-line {
             position: absolute;
             left: 0;
@@ -102,7 +98,6 @@
             z-index: 5;
         }
 
-        /* Ombre réaliste sur la pliure */
         .page-fold-shadow {
             position: absolute;
             top: 0;
@@ -124,12 +119,15 @@
     "@google/genai": "https://esm.sh/@google/genai@^1.35.0",
     "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
     "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3"
+    "react": "https://esm.sh/react@^19.2.3",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
   }
 }
 </script>
 </head>
 <body>
     <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
 </body>
 </html>
