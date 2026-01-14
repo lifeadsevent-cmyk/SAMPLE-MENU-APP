@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, ChefHat } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
@@ -27,8 +28,8 @@ const AIAssistant: React.FC = () => {
 
     try {
       // The API key is sourced from process.env.API_KEY as per instructions.
-      // Make sure you have set 'API_KEY' in your Netlify Environment Variables.
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
+      // Guidelines: Use this process.env.API_KEY string directly when initializing.
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: messages.map(m => ({
@@ -40,6 +41,7 @@ const AIAssistant: React.FC = () => {
         }
       });
 
+      // Use the .text property directly as per SDK guidelines
       const aiText = response.text || "Je vous prie de m'excuser, une légère perturbation dans mes pensées. Comment puis-je vous aider ?";
       setMessages(prev => [...prev, { role: 'model', text: aiText }]);
     } catch (error) {
