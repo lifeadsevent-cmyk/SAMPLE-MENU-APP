@@ -7,6 +7,7 @@ interface FlipSheetProps {
   frontContent: React.ReactNode;
   backContent: React.ReactNode;
   isActive: boolean;
+  currentPageSide: 'front' | 'back';
 }
 
 const FlipSheet: React.FC<FlipSheetProps> = ({ 
@@ -14,7 +15,8 @@ const FlipSheet: React.FC<FlipSheetProps> = ({
   zIndex, 
   frontContent, 
   backContent,
-  isActive
+  isActive,
+  currentPageSide
 }) => {
   return (
     <div 
@@ -24,14 +26,25 @@ const FlipSheet: React.FC<FlipSheetProps> = ({
         pointerEvents: isActive ? 'auto' : 'none' 
       }}
     >
-      <div className="sheet-front paper-texture h-full w-full">
+      <div 
+        className="sheet-front paper-texture h-full w-full"
+        style={{ 
+          pointerEvents: (isActive && currentPageSide === 'front') ? 'auto' : 'none',
+          visibility: isFlipped ? 'hidden' : 'visible'
+        }}
+      >
         <div className="spine-line" />
         <div className="page-fold-shadow" />
         {frontContent}
       </div>
 
-      <div className="sheet-back paper-texture h-full w-full">
-        {/* Pour le verso, la reliure et l'ombre sont à droite car la page est retournée */}
+      <div 
+        className="sheet-back paper-texture h-full w-full"
+        style={{ 
+          pointerEvents: (isActive && currentPageSide === 'back') ? 'auto' : 'none',
+          visibility: isFlipped ? 'visible' : 'hidden'
+        }}
+      >
         <div className="spine-line" style={{ left: 'auto', right: 0 }} />
         <div className="page-fold-shadow" style={{ left: 'auto', right: 0, background: 'linear-gradient(to left, rgba(0,0,0,0.4) 0%, transparent 100%)' }} />
         {backContent}

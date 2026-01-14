@@ -6,7 +6,7 @@ export interface MenuItem {
   name: string;
   description: string;
   price: string;
-  category: 'Entrées' | 'Viandes' | 'Poissons' | 'Pizzas' | 'Desserts' | 'Boissons';
+  category: 'Entrées' | 'Pâtes' | 'Pizzas' | 'Viandes' | 'Poulet' | 'Poissons' | 'Sandwiches' | 'Desserts';
   image: string;
   ingredients?: string[];
 }

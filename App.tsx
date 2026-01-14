@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Share2, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 import PageContent from './components/PageContent';
@@ -24,36 +25,50 @@ const App: React.FC = () => {
     {
       front: <PageContent 
         type="menu" 
+        title="Pâtes" 
+        items={MENU_ITEMS.filter(i => i.category === 'Pâtes')} 
+        onItemClick={setSelectedItem} 
+      />,
+      back: <PageContent 
+        type="menu" 
+        title="Pizzas" 
+        items={MENU_ITEMS.filter(i => i.category === 'Pizzas')} 
+        onItemClick={setSelectedItem} 
+      />
+    },
+    {
+      front: <PageContent 
+        type="menu" 
         title="Viandes" 
         items={MENU_ITEMS.filter(i => i.category === 'Viandes')} 
         onItemClick={setSelectedItem} 
       />,
       back: <PageContent 
         type="menu" 
-        title="Poissons" 
-        items={MENU_ITEMS.filter(i => i.category === 'Poissons')} 
+        title="Poulet" 
+        items={MENU_ITEMS.filter(i => i.category === 'Poulet')} 
         onItemClick={setSelectedItem} 
       />
     },
     {
       front: <PageContent 
         type="menu" 
-        title="Pizzas" 
-        items={MENU_ITEMS.filter(i => i.category === 'Pizzas')} 
+        title="Poissons" 
+        items={MENU_ITEMS.filter(i => i.category === 'Poissons')} 
         onItemClick={setSelectedItem} 
       />,
       back: <PageContent 
         type="menu" 
-        title="Desserts" 
-        items={MENU_ITEMS.filter(i => i.category === 'Desserts')} 
+        title="Sandwiches" 
+        items={MENU_ITEMS.filter(i => i.category === 'Sandwiches')} 
         onItemClick={setSelectedItem} 
       />
     },
     {
       front: <PageContent 
         type="menu" 
-        title="Boissons" 
-        items={MENU_ITEMS.filter(i => i.category === 'Boissons')} 
+        title="Desserts" 
+        items={MENU_ITEMS.filter(i => i.category === 'Desserts')} 
         onItemClick={setSelectedItem} 
       />,
       back: <PageContent type="back" />
@@ -79,7 +94,7 @@ const App: React.FC = () => {
   const canvasTranslation = isBackSide ? 'translateX(50%)' : 'translateX(-50%)';
 
   return (
-    <div className="h-screen w-screen bg-stone-950 flex flex-col items-center justify-between p-4 overflow-hidden safe-area-inset">
+    <div className="h-screen w-screen bg-stone-950 flex flex-col items-center justify-between p-4 overflow-hidden safe-area-inset touch-none">
       {/* Décoration de fond */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-amber-600/5 rounded-full blur-[120px]"></div>
@@ -140,17 +155,22 @@ const App: React.FC = () => {
           >
             {sheets.map((sheet, idx) => {
               const isFlipped = currentPage > (idx * 2);
-              const zIndex = isFlipped ? idx : totalSheets - idx;
               const isCurrentlyInView = Math.floor(currentPage / 2) === idx;
+              
+              // Logique de Z-index cruciale pour éviter les clics fantômes
+              let zIndex = isFlipped ? idx : totalSheets - idx;
+              if (isCurrentlyInView) zIndex = 100; // Priorité maximale à la page vue
 
               return (
                 <FlipSheet 
                   key={idx}
                   isFlipped={isFlipped}
                   isActive={isCurrentlyInView}
+                  currentPageSide={isBackSide ? 'back' : 'front'}
                   zIndex={zIndex}
-                  frontContent={sheet.front}
-                  backContent={sheet.back}
+                  // Fix: Using React.ReactElement<any> to resolve TypeScript overload matching errors when passing custom props like 'isActive' in cloneElement
+                  frontContent={React.cloneElement(sheet.front as React.ReactElement<any>, { isActive: isCurrentlyInView && !isBackSide })}
+                  backContent={React.cloneElement(sheet.back as React.ReactElement<any>, { isActive: isCurrentlyInView && isBackSide })}
                 />
               );
             })}

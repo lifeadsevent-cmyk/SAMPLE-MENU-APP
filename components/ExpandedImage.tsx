@@ -40,27 +40,27 @@ const ExpandedImage: React.FC<ExpandedImageProps> = ({ item, onClose }) => {
       {/* Conteneur principal - Prend tout l'écran sur mobile */}
       <div 
         className="relative w-full h-full flex flex-col md:flex-row overflow-y-auto no-scrollbar bg-stone-950"
-        onClick={onClose}
+        onClick={(e) => {
+          // Permet de cliquer sur le fond pour fermer, mais ne fait rien si on clique sur le contenu spécifique
+          // Cependant, comme tout le conteneur est scrollable, on laisse le comportement global de fermeture
+          // sauf sur les éléments interactifs
+        }}
       >
         {/* Section Image - Immersive */}
-        <div className="w-full md:w-1/2 h-[50vh] md:h-screen relative overflow-hidden">
+        <div className="w-full md:w-1/2 h-[50vh] md:h-screen relative overflow-hidden shrink-0">
           <img 
             src={item.image} 
             alt={item.name} 
             className="w-full h-full object-cover animate-out zoom-out-110 duration-1000 fill-mode-forwards scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-stone-950/30"></div>
-          
-          {/* Badge de prix flottant sur l'image */}
-          <div className="absolute bottom-8 left-8">
-            <div className="text-4xl md:text-6xl font-serif text-amber-500 drop-shadow-2xl">
-              {item.price}
-            </div>
-          </div>
         </div>
 
         {/* Section Détails - Noir et Or */}
-        <div className="w-full md:w-1/2 min-h-[50vh] p-8 md:p-16 flex flex-col justify-center relative">
+        <div 
+          className="w-full md:w-1/2 min-h-[50vh] p-8 md:p-16 flex flex-col justify-center relative bg-stone-950"
+          onClick={(e) => e.stopPropagation()} // Empêche la fermeture lors du clic sur les détails
+        >
           
           {/* Header de l'article */}
           <div className="mb-10">
@@ -76,20 +76,32 @@ const ExpandedImage: React.FC<ExpandedImageProps> = ({ item, onClose }) => {
             </p>
           </div>
 
-          {/* Section Ingrédients - Mise en avant demandée */}
+          {/* Section Composition et Prix alignés */}
           <div className="mb-12">
-            <h3 className="text-amber-600 font-serif text-sm uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-              <UtensilsCrossed className="w-4 h-4" /> Composition
-            </h3>
-            <div className="flex flex-wrap gap-3">
-              {item.ingredients?.map((ing, i) => (
-                <div key={i} className="flex items-center">
-                  <span className="text-amber-500/50 mr-2">✦</span>
-                  <span className="text-stone-300 text-sm md:text-base uppercase tracking-widest font-light">
-                    {ing}
-                  </span>
+            <div className="flex items-end justify-between mb-6 border-b border-amber-900/20 pb-4">
+              <h3 className="text-amber-600 font-serif text-sm uppercase tracking-[0.2em] flex items-center gap-2">
+                <UtensilsCrossed className="w-4 h-4" /> Composition
+              </h3>
+              <div className="text-3xl md:text-4xl font-serif text-amber-500 leading-none">
+                {item.price}
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap gap-x-6 gap-y-3">
+              {item.ingredients && item.ingredients.length > 0 ? (
+                item.ingredients.map((ing, i) => (
+                  <div key={i} className="flex items-center">
+                    <span className="text-amber-500/50 mr-2 text-xs">✦</span>
+                    <span className="text-stone-300 text-sm md:text-base uppercase tracking-widest font-light">
+                      {ing}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-stone-500 italic text-sm font-light">
+                  Ingrédients sélectionnés par notre Chef selon le marché du jour.
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
@@ -116,10 +128,16 @@ const ExpandedImage: React.FC<ExpandedImageProps> = ({ item, onClose }) => {
           </div>
 
           {/* Note de fermeture */}
-          <div className="mt-12 text-center md:text-left">
+          <div className="mt-12 text-center md:text-left flex justify-between items-center">
             <p className="text-[9px] text-amber-700/40 uppercase tracking-[0.5em] animate-pulse">
-              Touchez n'importe où pour revenir
+              Glissez pour explorer
             </p>
+            <button 
+              onClick={onClose}
+              className="text-amber-500 border border-amber-600/30 px-6 py-2 rounded-full text-xs uppercase tracking-widest hover:bg-amber-600 hover:text-stone-950 transition-all pointer-events-auto"
+            >
+              Fermer
+            </button>
           </div>
         </div>
       </div>

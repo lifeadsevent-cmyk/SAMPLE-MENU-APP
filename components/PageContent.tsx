@@ -7,9 +7,10 @@ interface PageContentProps {
   title?: string;
   items?: MenuItem[];
   onItemClick?: (item: MenuItem) => void;
+  isActive?: boolean; // Prop ajoutée pour contrôler la réactivité
 }
 
-const PageContent: React.FC<PageContentProps> = ({ type, title, items, onItemClick }) => {
+const PageContent: React.FC<PageContentProps> = ({ type, title, items, onItemClick, isActive = true }) => {
   if (type === 'cover') {
     return (
       <div className="h-full w-full flex flex-col items-center justify-center p-8 text-center bg-stone-900 relative overflow-hidden pointer-events-none">
@@ -53,8 +54,10 @@ const PageContent: React.FC<PageContentProps> = ({ type, title, items, onItemCli
           {items?.map((item) => (
             <button 
               key={item.id} 
-              className="w-full text-left group cursor-pointer active:scale-[0.99] transition-all relative block focus:outline-none pointer-events-auto"
+              disabled={!isActive}
+              className={`w-full text-left group transition-all relative block focus:outline-none ${isActive ? 'cursor-pointer active:scale-[0.99] pointer-events-auto' : 'pointer-events-none opacity-80'}`}
               onClick={(e) => {
+                if (!isActive) return;
                 e.preventDefault();
                 e.stopPropagation();
                 if (onItemClick) {
