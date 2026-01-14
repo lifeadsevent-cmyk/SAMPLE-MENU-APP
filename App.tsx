@@ -12,71 +12,52 @@ const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
-  const sheets = useMemo(() => [
-    {
-      front: <PageContent type="cover" />,
-      back: <PageContent 
-        type="menu" 
-        title="Entrées" 
-        items={MENU_ITEMS.filter(i => i.category === 'Entrées')} 
-        onItemClick={setSelectedItem} 
-      />
-    },
-    {
-      front: <PageContent 
-        type="menu" 
-        title="Pâtes" 
-        items={MENU_ITEMS.filter(i => i.category === 'Pâtes')} 
-        onItemClick={setSelectedItem} 
-      />,
-      back: <PageContent 
-        type="menu" 
-        title="Pizzas" 
-        items={MENU_ITEMS.filter(i => i.category === 'Pizzas')} 
-        onItemClick={setSelectedItem} 
-      />
-    },
-    {
-      front: <PageContent 
-        type="menu" 
-        title="Viandes" 
-        items={MENU_ITEMS.filter(i => i.category === 'Viandes')} 
-        onItemClick={setSelectedItem} 
-      />,
-      back: <PageContent 
-        type="menu" 
-        title="Poulet" 
-        items={MENU_ITEMS.filter(i => i.category === 'Poulet')} 
-        onItemClick={setSelectedItem} 
-      />
-    },
-    {
-      front: <PageContent 
-        type="menu" 
-        title="Poissons" 
-        items={MENU_ITEMS.filter(i => i.category === 'Poissons')} 
-        onItemClick={setSelectedItem} 
-      />,
-      back: <PageContent 
-        type="menu" 
-        title="Sandwiches" 
-        items={MENU_ITEMS.filter(i => i.category === 'Sandwiches')} 
-        onItemClick={setSelectedItem} 
-      />
-    },
-    {
-      front: <PageContent 
-        type="menu" 
-        title="Desserts" 
-        items={MENU_ITEMS.filter(i => i.category === 'Desserts')} 
-        onItemClick={setSelectedItem} 
-      />,
-      back: <PageContent type="back" />
-    }
-  ], []);
+  // Pagination dynamique : environ 8 plats par page pour garder de l'air
+  const ITEMS_PER_PAGE = 8;
 
-  const totalSheets = sheets.length;
-  const totalLogicalPages = totalSheets * 2;
+  const dynamicPages = useMemo(() => {
+    const pages: React.ReactElement<any>[] = [];
+    
+    // Page de garde
+    pages.push(<PageContent type="cover" />);
+
+    // Groupement par catégories
+    const categories: MenuItem['category'][] = [
+      'Entrées', 'Pâtes', 'Pizzas', 'Viandes', 'Poulet', 'Poissons', 'Sandwiches', 'Desserts'
+    ];
+
+    categories.forEach(cat => {
+      const catItems = MENU_ITEMS.filter(item => item.category === cat);
+      if (catItems.length === 0) return;
+
+      // Découpage en sous-pages pour cette catégorie
+      for (let i = 0; i < catItems.length; i += ITEMS_PER_PAGE) {
+        const chunk = catItems.slice(i, i + ITEMS_PER_PAGE);
+        pages.push(
+          <PageContent 
+            type="menu" 
+            title={cat} 
+            items={chunk} 
+            onItemClick={setSelectedItem} 
+            isContinuation={i > 0}
+          />
+        );
+      }
+    });
+
+    // Page de fin
+    pages.push(<PageContent type="back" />);
+
+    // On s'assure d'avoir un nombre pair de pages (pour compléter les feuilles)
+    if (pages.length % 2 !== 0) {
+      pages.push(<PageContent type="back" />);
+    }
+
+    return pages;
+  }, [setSelectedItem]);
+
+  const totalLogicalPages = dynamicPages.length;
+  const totalSheets = totalLogicalPages / 2;
 
   const handleNext = () => {
     if (currentPage < totalLogicalPages - 1) {
@@ -116,50 +97,36 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-1 w-full flex items-center justify-center relative z-20 overflow-visible">
-        {/* Zones de navigation invisibles pour le toucher */}
+        {/* Navigation tactique invisible */}
         <div className="absolute inset-0 z-[150] flex pointer-events-none">
           <div 
-            className={`w-[25%] h-full pointer-events-auto cursor-pointer flex items-center justify-start pl-4 group transition-opacity ${currentPage === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-            onClick={(e) => { 
-              e.preventDefault();
-              e.stopPropagation(); 
-              handlePrev(); 
-            }}
+            className={`w-[20%] h-full pointer-events-auto cursor-pointer flex items-center justify-start pl-4 group transition-opacity ${currentPage === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handlePrev(); }}
           >
-            <div className="w-12 h-12 rounded-full bg-stone-900/90 border border-amber-600/30 flex items-center justify-center text-amber-500 shadow-2xl group-hover:bg-amber-600 group-hover:text-stone-950 transition-all duration-300">
-              <ChevronLeft size={28} />
+            <div className="w-10 h-10 rounded-full bg-stone-900/90 border border-amber-600/30 flex items-center justify-center text-amber-500 shadow-2xl group-hover:bg-amber-600 group-hover:text-stone-950 transition-all">
+              <ChevronLeft size={24} />
             </div>
           </div>
-
           <div className="flex-1 h-full pointer-events-none" />
-
           <div 
-            className={`w-[25%] h-full pointer-events-auto cursor-pointer flex items-center justify-end pr-4 group transition-opacity ${currentPage === totalLogicalPages - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-            onClick={(e) => { 
-              e.preventDefault();
-              e.stopPropagation(); 
-              handleNext(); 
-            }}
+            className={`w-[20%] h-full pointer-events-auto cursor-pointer flex items-center justify-end pr-4 group transition-opacity ${currentPage === totalLogicalPages - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleNext(); }}
           >
-            <div className="w-12 h-12 rounded-full bg-stone-900/90 border border-amber-600/30 flex items-center justify-center text-amber-500 shadow-2xl group-hover:bg-amber-600 group-hover:text-stone-950 transition-all duration-300">
-              <ChevronRight size={28} />
+            <div className="w-10 h-10 rounded-full bg-stone-900/90 border border-amber-600/30 flex items-center justify-center text-amber-500 shadow-2xl group-hover:bg-amber-600 group-hover:text-stone-950 transition-all">
+              <ChevronRight size={24} />
             </div>
           </div>
         </div>
 
         {/* Le Livre 3D */}
         <div className="book-viewport z-[50]">
-          <div 
-            className="book-canvas"
-            style={{ transform: canvasTranslation }}
-          >
-            {sheets.map((sheet, idx) => {
+          <div className="book-canvas" style={{ transform: canvasTranslation }}>
+            {Array.from({ length: totalSheets }).map((_, idx) => {
               const isFlipped = currentPage > (idx * 2);
               const isCurrentlyInView = Math.floor(currentPage / 2) === idx;
               
-              // Logique de Z-index cruciale pour éviter les clics fantômes
               let zIndex = isFlipped ? idx : totalSheets - idx;
-              if (isCurrentlyInView) zIndex = 100; // Priorité maximale à la page vue
+              if (isCurrentlyInView) zIndex = 100;
 
               return (
                 <FlipSheet 
@@ -168,9 +135,8 @@ const App: React.FC = () => {
                   isActive={isCurrentlyInView}
                   currentPageSide={isBackSide ? 'back' : 'front'}
                   zIndex={zIndex}
-                  // Fix: Using React.ReactElement<any> to resolve TypeScript overload matching errors when passing custom props like 'isActive' in cloneElement
-                  frontContent={React.cloneElement(sheet.front as React.ReactElement<any>, { isActive: isCurrentlyInView && !isBackSide })}
-                  backContent={React.cloneElement(sheet.back as React.ReactElement<any>, { isActive: isCurrentlyInView && isBackSide })}
+                  frontContent={React.cloneElement(dynamicPages[idx * 2], { isActive: isCurrentlyInView && !isBackSide })}
+                  backContent={React.cloneElement(dynamicPages[idx * 2 + 1], { isActive: isCurrentlyInView && isBackSide })}
                 />
               );
             })}
@@ -178,29 +144,24 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      <footer className="w-full flex flex-col items-center gap-6 pb-10 z-[100]">
-        <div className="flex items-center justify-center gap-4">
+      <footer className="w-full flex flex-col items-center gap-4 pb-6 z-[100]">
+        <div className="flex items-center justify-center gap-2 max-w-full overflow-x-auto no-scrollbar px-4">
            {Array.from({ length: totalLogicalPages }).map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentPage(idx)}
-                className={`h-1.5 rounded-full transition-all duration-500 ${
-                  currentPage === idx ? 'w-8 bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'w-2 bg-stone-800 hover:bg-stone-600'
+                className={`h-1 rounded-full transition-all duration-300 ${
+                  currentPage === idx ? 'w-6 bg-amber-500' : 'w-1.5 bg-stone-800'
                 }`}
-                aria-label={`Aller à la page ${idx + 1}`}
               />
             ))}
         </div>
-        
-        <div className="text-[10px] text-stone-600 tracking-[0.5em] uppercase font-light">
-          Page {currentPage + 1} sur {totalLogicalPages}
+        <div className="text-[9px] text-stone-600 tracking-[0.4em] uppercase font-light">
+          Menu Prestige — Page {currentPage + 1}
         </div>
       </footer>
 
-      {/* Assistant IA Flottant */}
       <AIAssistant />
-
-      {/* Modal Image Agrandie */}
       <ExpandedImage item={selectedItem} onClose={() => setSelectedItem(null)} />
     </div>
   );
