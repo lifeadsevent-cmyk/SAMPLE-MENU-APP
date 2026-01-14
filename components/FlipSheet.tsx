@@ -20,7 +20,7 @@ const FlipSheet: React.FC<FlipSheetProps> = ({
 }) => {
   return (
     <div 
-      className={`sheet ${isFlipped ? 'flipped' : ''} ${isActive ? 'active' : ''}`}
+      className={`sheet ${isFlipped ? 'flipped' : ''} ${isActive ? 'active-sheet' : ''}`}
       style={{ 
         zIndex,
         pointerEvents: isActive ? 'auto' : 'none' 
@@ -30,7 +30,8 @@ const FlipSheet: React.FC<FlipSheetProps> = ({
         className="sheet-front paper-texture h-full w-full"
         style={{ 
           pointerEvents: (isActive && currentPageSide === 'front') ? 'auto' : 'none',
-          visibility: isFlipped ? 'hidden' : 'visible'
+          visibility: isFlipped ? 'hidden' : 'visible',
+          zIndex: currentPageSide === 'front' ? 10 : 1
         }}
       >
         <div className="spine-line" />
@@ -42,11 +43,12 @@ const FlipSheet: React.FC<FlipSheetProps> = ({
         className="sheet-back paper-texture h-full w-full"
         style={{ 
           pointerEvents: (isActive && currentPageSide === 'back') ? 'auto' : 'none',
-          visibility: isFlipped ? 'visible' : 'hidden'
+          visibility: isFlipped ? 'visible' : 'hidden',
+          zIndex: currentPageSide === 'back' ? 10 : 1
         }}
       >
         <div className="spine-line" style={{ left: 'auto', right: 0 }} />
-        <div className="page-fold-shadow" style={{ left: 'auto', right: 0, background: 'linear-gradient(to left, rgba(0,0,0,0.4) 0%, transparent 100%)' }} />
+        <div className="page-fold-shadow" style={{ left: 'auto', right: 0, transform: 'scaleX(-1)' }} />
         {backContent}
       </div>
     </div>

@@ -16,10 +16,11 @@ const ExpandedImage: React.FC<ExpandedImageProps> = ({ item, onClose }) => {
   useEffect(() => {
     if (item) {
       setLoading(true);
+      setRecommendation(""); // Reset
       getChefRecommendation(item.name).then(res => {
         setRecommendation(res);
         setLoading(false);
-      });
+      }).catch(() => setLoading(false));
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -31,92 +32,76 @@ const ExpandedImage: React.FC<ExpandedImageProps> = ({ item, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-[500] flex items-center justify-center animate-in fade-in duration-500 cursor-pointer"
-      onClick={onClose} // Ferme au clic n'importe où sur l'overlay
+      className="fixed inset-0 z-[1000] flex items-center justify-center animate-in fade-in duration-300 cursor-pointer"
+      onClick={onClose} // Fermeture globale sur TOUTE la zone
     >
-      {/* Background sombre et flou */}
-      <div className="absolute inset-0 bg-stone-950/98 backdrop-blur-xl" />
+      {/* Overlay sombre avec flou très prononcé */}
+      <div className="absolute inset-0 bg-stone-950/98 backdrop-blur-2xl" />
       
-      {/* Conteneur principal */}
-      <div className="relative w-full h-full flex flex-col md:flex-row overflow-y-auto no-scrollbar bg-transparent">
-        
-        {/* Section Image - 50% de l'écran */}
-        <div className="w-full md:w-1/2 h-[45vh] md:h-screen relative overflow-hidden shrink-0 pointer-events-none">
+      <div className="relative w-full h-full flex flex-col md:flex-row bg-transparent">
+        {/* Section Image Immersive */}
+        <div className="w-full md:w-1/2 h-[40vh] md:h-screen relative overflow-hidden shrink-0">
+          <div className="absolute inset-0 bg-stone-900 animate-pulse" /> {/* Placeholder pendant chargement */}
           <img 
             src={item.image} 
             alt={item.name} 
-            className="w-full h-full object-cover scale-105 animate-in zoom-in-110 duration-[2000ms]"
+            className="w-full h-full object-cover relative z-10 transition-opacity duration-1000"
+            onLoad={(e) => (e.currentTarget.style.opacity = "1")}
+            style={{ opacity: 0 }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent"></div>
+          <div className="absolute inset-0 z-20 bg-gradient-to-t from-stone-950 via-transparent to-transparent"></div>
         </div>
 
-        {/* Section Détails - 50% de l'écran */}
-        <div className="w-full md:w-1/2 min-h-[55vh] md:h-screen p-8 md:p-16 flex flex-col justify-center relative bg-stone-950 md:bg-transparent">
-          
-          <button 
-            className="absolute top-8 right-8 text-amber-500/50 hover:text-amber-500 transition-colors hidden md:block"
-            onClick={onClose}
-          >
-            <X size={32} />
-          </button>
-
-          <div className="mb-8">
-            <div className="flex items-center gap-3 text-amber-600 mb-4 uppercase tracking-[0.3em] text-[9px] font-bold">
-              <Sparkles className="w-3.5 h-3.5" />
-              Sélection du Chef
+        {/* Section Infos */}
+        <div className="w-full md:w-1/2 flex flex-col justify-center p-8 md:p-20 relative bg-stone-950 md:bg-transparent">
+          <div className="mb-6">
+            <div className="flex items-center gap-2 text-amber-600 mb-3 uppercase tracking-[0.3em] text-[8px] font-bold">
+              <Sparkles className="w-3 h-3" />
+              Signature de L'Éclat d'Or
             </div>
-            <h2 className="text-3xl md:text-5xl font-serif text-amber-400 mb-6 uppercase tracking-wider leading-tight">
+            <h2 className="text-3xl md:text-5xl font-serif text-amber-400 mb-4 uppercase tracking-wider leading-none">
               {item.name}
             </h2>
-            <p className="text-stone-400 text-base md:text-lg italic font-light leading-relaxed border-l border-amber-900/30 pl-6">
+            <p className="text-stone-400 text-sm md:text-base italic font-light leading-relaxed border-l border-amber-900/20 pl-4">
               {item.description}
             </p>
           </div>
 
-          {/* Composition et Prix */}
-          <div className="mb-10">
-            <div className="flex items-end justify-between mb-6 border-b border-amber-900/20 pb-4">
-              <h3 className="text-amber-600 font-serif text-xs uppercase tracking-[0.2em] flex items-center gap-2">
-                <UtensilsCrossed className="w-3.5 h-3.5" /> Composition
-              </h3>
-              <div className="text-2xl md:text-3xl font-serif text-amber-500 leading-none">
-                {item.price}
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-x-5 gap-y-2">
-              <div className="text-stone-300 text-xs md:text-sm uppercase tracking-widest font-light opacity-80">
-                Ingrédients frais sélectionnés ce matin au Marché de Guéliz.
-              </div>
+          <div className="mb-8 pb-4 border-b border-amber-900/10">
+            <div className="flex justify-between items-center">
+              <span className="text-amber-600 font-serif text-[10px] uppercase tracking-widest flex items-center gap-2">
+                <UtensilsCrossed className="w-3 h-3" /> Gastronomie
+              </span>
+              <span className="text-2xl font-serif text-amber-500">{item.price}</span>
             </div>
           </div>
 
-          {/* Parole du Chef (IA) */}
-          <div className="mt-6">
-            <div className="p-5 bg-amber-950/10 border border-amber-900/20 rounded-sm">
-              <h4 className="text-amber-500 font-serif italic text-base mb-2 flex items-center gap-2">
-                <ChefHat className="w-4 h-4" /> La Parole du Chef
-              </h4>
-              <div className="min-h-[40px]">
-                {loading ? (
-                  <div className="flex gap-1.5 py-2">
-                    <div className="w-1 h-1 bg-amber-600 rounded-full animate-bounce"></div>
-                    <div className="w-1 h-1 bg-amber-600 rounded-full animate-bounce delay-100"></div>
-                    <div className="w-1 h-1 bg-amber-600 rounded-full animate-bounce delay-200"></div>
-                  </div>
-                ) : (
-                  <p className="text-stone-400 italic text-sm md:text-base leading-relaxed font-light">
-                    "{recommendation}"
-                  </p>
-                )}
-              </div>
+          <div className="bg-amber-950/10 border border-amber-900/20 p-5 rounded-sm">
+            <h4 className="text-amber-500 font-serif italic text-sm mb-2 flex items-center gap-2">
+              <ChefHat className="w-4 h-4" /> La Parole du Chef
+            </h4>
+            <div className="min-h-[40px]">
+              {loading ? (
+                <div className="flex gap-1.5 py-1">
+                  <div className="w-1 h-1 bg-amber-600/50 rounded-full animate-bounce"></div>
+                  <div className="w-1 h-1 bg-amber-600/50 rounded-full animate-bounce delay-100"></div>
+                  <div className="w-1 h-1 bg-amber-600/50 rounded-full animate-bounce delay-200"></div>
+                </div>
+              ) : (
+                <p className="text-stone-400 italic text-xs md:text-sm leading-relaxed font-light">
+                  "{recommendation || "Une invitation au voyage, où chaque bouchée raconte une histoire de terroir et d'exception."}"
+                </p>
+              )}
             </div>
           </div>
 
-          <div className="mt-10 text-center md:text-left flex justify-between items-center opacity-40">
-            <p className="text-[8px] text-amber-700 uppercase tracking-[0.5em] animate-pulse">
-              Cliquer n'importe où pour revenir
-            </p>
+          <div className="absolute bottom-8 right-8 md:static md:mt-10">
+            <button 
+              onClick={onClose}
+              className="px-6 py-2 border border-amber-600/30 text-amber-500/60 uppercase text-[9px] tracking-[0.4em] hover:text-amber-500 transition-all rounded-full"
+            >
+              Fermer l'expérience
+            </button>
           </div>
         </div>
       </div>

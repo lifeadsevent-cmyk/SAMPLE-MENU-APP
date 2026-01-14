@@ -12,8 +12,8 @@ const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
-  // Pagination dynamique : environ 8 plats par page pour garder de l'air
-  const ITEMS_PER_PAGE = 8;
+  // Pagination dense : environ 10 plats par page
+  const ITEMS_PER_PAGE = 10;
 
   const dynamicPages = useMemo(() => {
     const pages: React.ReactElement<any>[] = [];
@@ -21,7 +21,7 @@ const App: React.FC = () => {
     // Page de garde
     pages.push(<PageContent type="cover" />);
 
-    // Groupement par catégories
+    // Liste des catégories ordonnées
     const categories: MenuItem['category'][] = [
       'Entrées', 'Pâtes', 'Pizzas', 'Viandes', 'Poulet', 'Poissons', 'Sandwiches', 'Desserts'
     ];
@@ -30,7 +30,7 @@ const App: React.FC = () => {
       const catItems = MENU_ITEMS.filter(item => item.category === cat);
       if (catItems.length === 0) return;
 
-      // Découpage en sous-pages pour cette catégorie
+      // Découpage automatique des catégories en plusieurs pages si nécessaire
       for (let i = 0; i < catItems.length; i += ITEMS_PER_PAGE) {
         const chunk = catItems.slice(i, i + ITEMS_PER_PAGE);
         pages.push(
@@ -45,10 +45,10 @@ const App: React.FC = () => {
       }
     });
 
-    // Page de fin
+    // Page finale
     pages.push(<PageContent type="back" />);
 
-    // On s'assure d'avoir un nombre pair de pages (pour compléter les feuilles)
+    // Assurer un nombre pair de pages pour les feuilles physiques
     if (pages.length % 2 !== 0) {
       pages.push(<PageContent type="back" />);
     }
@@ -72,61 +72,63 @@ const App: React.FC = () => {
   };
 
   const isBackSide = currentPage % 2 !== 0;
+  // Décalage du livre pour qu'il s'ouvre harmonieusement
   const canvasTranslation = isBackSide ? 'translateX(50%)' : 'translateX(-50%)';
 
   return (
     <div className="h-screen w-screen bg-stone-950 flex flex-col items-center justify-between p-4 overflow-hidden safe-area-inset touch-none">
-      {/* Décoration de fond */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-600/5 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-900/5 rounded-full blur-[120px]"></div>
+      <div className="absolute inset-0 pointer-events-none opacity-30">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-600/10 rounded-full blur-[150px]"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-amber-900/10 rounded-full blur-[150px]"></div>
       </div>
 
       <header className="w-full flex justify-between items-center py-2 z-[100]">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 border border-amber-600/40 flex items-center justify-center text-amber-500 font-serif text-lg bg-stone-900/50 shadow-inner">E</div>
+          <div className="h-8 w-8 border border-amber-600/40 flex items-center justify-center text-amber-500 font-serif text-sm bg-stone-900/50">E</div>
           <div>
-            <h1 className="text-amber-500 font-serif text-sm tracking-[0.2em] uppercase leading-none mb-1">L'Éclat d'Or</h1>
-            <p className="text-[8px] text-stone-500 tracking-[0.3em] uppercase">Marrakech</p>
+            <h1 className="text-amber-500 font-serif text-xs tracking-[0.2em] uppercase leading-none mb-1">L'Éclat d'Or</h1>
+            <p className="text-[7px] text-stone-500 tracking-[0.3em] uppercase">Gastronomie</p>
           </div>
         </div>
-        <div className="flex gap-2">
-          <button className="p-2 text-stone-500 hover:text-amber-500 transition-colors" aria-label="Partager"><Share2 size={20} /></button>
-          <button className="p-2 text-stone-500 hover:text-amber-500 transition-colors" aria-label="Informations"><Info size={20} /></button>
+        <div className="flex gap-1">
+          <button className="p-2 text-stone-500 hover:text-amber-500 transition-colors"><Share2 size={16} /></button>
+          <button className="p-2 text-stone-500 hover:text-amber-500 transition-colors"><Info size={16} /></button>
         </div>
       </header>
 
       <main className="flex-1 w-full flex items-center justify-center relative z-20 overflow-visible">
-        {/* Navigation tactique invisible */}
+        {/* Navigation Tactique Zones Clivables */}
         <div className="absolute inset-0 z-[150] flex pointer-events-none">
           <div 
-            className={`w-[20%] h-full pointer-events-auto cursor-pointer flex items-center justify-start pl-4 group transition-opacity ${currentPage === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handlePrev(); }}
+            className={`w-[15%] h-full pointer-events-auto cursor-pointer flex items-center justify-start pl-2 ${currentPage === 0 ? 'opacity-0' : 'opacity-100'}`}
+            onClick={handlePrev}
           >
-            <div className="w-10 h-10 rounded-full bg-stone-900/90 border border-amber-600/30 flex items-center justify-center text-amber-500 shadow-2xl group-hover:bg-amber-600 group-hover:text-stone-950 transition-all">
-              <ChevronLeft size={24} />
+            <div className="w-8 h-8 rounded-full bg-stone-900/80 border border-amber-600/20 flex items-center justify-center text-amber-500">
+              <ChevronLeft size={20} />
             </div>
           </div>
           <div className="flex-1 h-full pointer-events-none" />
           <div 
-            className={`w-[20%] h-full pointer-events-auto cursor-pointer flex items-center justify-end pr-4 group transition-opacity ${currentPage === totalLogicalPages - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleNext(); }}
+            className={`w-[15%] h-full pointer-events-auto cursor-pointer flex items-center justify-end pr-2 ${currentPage === totalLogicalPages - 1 ? 'opacity-0' : 'opacity-100'}`}
+            onClick={handleNext}
           >
-            <div className="w-10 h-10 rounded-full bg-stone-900/90 border border-amber-600/30 flex items-center justify-center text-amber-500 shadow-2xl group-hover:bg-amber-600 group-hover:text-stone-950 transition-all">
-              <ChevronRight size={24} />
+            <div className="w-8 h-8 rounded-full bg-stone-900/80 border border-amber-600/20 flex items-center justify-center text-amber-500">
+              <ChevronRight size={20} />
             </div>
           </div>
         </div>
 
-        {/* Le Livre 3D */}
-        <div className="book-viewport z-[50]">
+        {/* Flipbook 3D */}
+        <div className="book-viewport">
           <div className="book-canvas" style={{ transform: canvasTranslation }}>
             {Array.from({ length: totalSheets }).map((_, idx) => {
-              const isFlipped = currentPage > (idx * 2);
-              const isCurrentlyInView = Math.floor(currentPage / 2) === idx;
+              const sheetIndex = idx;
+              const isFlipped = currentPage > (sheetIndex * 2);
+              const isCurrentlyInView = Math.floor(currentPage / 2) === sheetIndex;
               
-              let zIndex = isFlipped ? idx : totalSheets - idx;
-              if (isCurrentlyInView) zIndex = 100;
+              // Z-Index critique pour le déploiement mobile
+              let zIndex = isFlipped ? sheetIndex : totalSheets - sheetIndex;
+              if (isCurrentlyInView) zIndex = 200;
 
               return (
                 <FlipSheet 
@@ -144,20 +146,20 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      <footer className="w-full flex flex-col items-center gap-4 pb-6 z-[100]">
-        <div className="flex items-center justify-center gap-2 max-w-full overflow-x-auto no-scrollbar px-4">
+      <footer className="w-full flex flex-col items-center gap-3 pb-4 z-[100]">
+        <div className="flex items-center justify-center gap-1.5 max-w-[80vw] overflow-x-auto no-scrollbar py-2">
            {Array.from({ length: totalLogicalPages }).map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentPage(idx)}
                 className={`h-1 rounded-full transition-all duration-300 ${
-                  currentPage === idx ? 'w-6 bg-amber-500' : 'w-1.5 bg-stone-800'
+                  currentPage === idx ? 'w-4 bg-amber-500' : 'w-1 bg-stone-800'
                 }`}
               />
             ))}
         </div>
-        <div className="text-[9px] text-stone-600 tracking-[0.4em] uppercase font-light">
-          Menu Prestige — Page {currentPage + 1}
+        <div className="text-[8px] text-stone-600 tracking-[0.4em] uppercase font-light">
+          L'Éclat d'Or — Page {currentPage + 1} / {totalLogicalPages}
         </div>
       </footer>
 
